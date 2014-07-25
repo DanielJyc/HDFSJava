@@ -8,12 +8,12 @@ public class MainClass {
 	private static final Integer Integer = null;
 
 	public static void main(String[] args) throws IOException{
+		//Test DataNode.
 		DataNode tt = new DataNode();
 		UUID uuid = UUID.randomUUID();
 		System.out.println(uuid);
 		tt.writeFile(uuid.toString(), "test");
-		tt.readFile(uuid.toString());
-		
+		System.out.println(tt.readFile(uuid.toString()));		
 	}
 
 }
