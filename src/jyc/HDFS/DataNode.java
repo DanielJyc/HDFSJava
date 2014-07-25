@@ -9,7 +9,6 @@ public class DataNode {
 		fis.read(buf);
 		fis.close();		
 		return new String(buf);
-
 	}
 	
 	public static void writeFile(String uuid, String data)throws IOException
