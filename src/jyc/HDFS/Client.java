@@ -9,13 +9,23 @@ import java.util.Map.Entry;
 
 import jyc.HDFS.DataNode;
 import jyc.HDFS.NameNode;
-
+/**
+ * 功能：通过调用Client中的方法，对HDFS进行操作：对DataNode和NameNode进行封装。通过调节NameNode和DataNode实现文件的操作。
+ * @author DanielJyc
+ *
+ */
 public class Client {
 	NameNode namenode;
 	public Client(NameNode nn) {  
 		this.namenode = nn;
 	}
-	
+	/**
+	 * 功能：写入文件。通过调用DataNode和NameNode的方法，在DataNode写入实际数据；在NameNode写入元数据。
+	 * @param filename 文件名
+	 * @param data 文件内的数据
+	 * @throws IOException 
+	 * @throws ClassNotFoundException
+	 */
 	public void write(String filename, String data) throws IOException, ClassNotFoundException {
 		List chunks = new ArrayList();  //存放data分出来的num_chunks份数据
 		int chunkloc = 1;
@@ -36,6 +46,13 @@ public class Client {
 		}
 	}
 	
+	/**
+	 * 功能：从HDFS读取文件。通过调用DataNode和NameNode的方法，从DataNode读取实际数据；从NameNode读取元数据。
+	 * @param filename
+	 * @return 返回文件内容data（String）。如果文件不存在，或者DataNode被kill，返回"-1"。
+	 * @throws IOException
+	 * @throws ClassNotFoundException
+	 */
 	public String read(String filename) throws IOException, ClassNotFoundException {
 		if (true == namenode.exits(filename)) {
 			String data = new String();
@@ -56,7 +73,13 @@ public class Client {
 			return "-1";
 		}
 	}
-	
+	/**
+	 * 删除文件filename
+	 * @param String类型filename。
+	 * @return 删除成功，返回true；否则返回false。
+	 * @throws ClassNotFoundException
+	 * @throws IOException
+	 */
 	public boolean delete(String filename) throws ClassNotFoundException, IOException {
 		if (true ==  namenode.exits(filename)) {
 			List chunk_uuids = (List) namenode.filetable.get(filename);
@@ -73,7 +96,9 @@ public class Client {
 		}
 	}
 	
-	/*列出所有文件名*/
+	/**
+	 * 列出HDFS上面的所有文件名
+	 */
 	public void list_files() {
 		System.out.println("Files:");
 		Iterator it = (Iterator) namenode.filetable.entrySet().iterator();
@@ -83,7 +108,11 @@ public class Client {
 		}
 	}
 	
-	/*获取chunk数量*/
+	/**
+	 * 获取filename中的数据data的chunk数量
+	 * @param data：filename中的数据
+	 * @return filename中的数据data的chunk数量
+	 */
 	public int get_num_chunks(String data) {
 		return (int) Math.ceil((data.length()*1.0) / namenode.chunksize);
 	}

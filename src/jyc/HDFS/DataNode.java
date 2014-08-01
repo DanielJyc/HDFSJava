@@ -2,20 +2,30 @@ package jyc.HDFS;
 
 import java.io.*;
 import java.net.*;
-
+/**
+ * 功能：与DataNode建立连接，进行数据传输与通信
+ * @author DanielJyc
+ *
+ */
 public class DataNode {
 	private String dir_name;
 	private int port;
 	
 
-	/*初始化：不同的chunkloc对应不同的DataNode；通过修改port实现。
-	 * 后面可以通过数组存放不同的IP和端口号，从而实现真正意义的网络传输。*/
+	/**
+	 * 初始化：不同的chunkloc对应不同的DataNode；通过修改port实现。
+	 * 后面可以通过数组存放不同的IP和端口号，从而实现真正意义的网络传输。
+	 * @param chunkloc：不同的chunkloc对应不同的DataNodeServer，默认共3个。
+	 */
 	public DataNode(int chunkloc) {  
 		super();
 		this.port = chunkloc + 12345;
 	}
 	
-	/*将chunk写入chunk_uuid(文件名)*/
+	/**
+	 * 将chunk写入chunk_uuid(文件名)
+	 * @param chunk_uuid 及其内容chunk。均为String。
+	 */
 	public void write(String chunk_uuid, String chunk) throws IOException, ClassNotFoundException {
 		Socket client = null;
 		try {
@@ -33,7 +43,11 @@ public class DataNode {
 		client.close();
 	}
 	
-	/*从chunk_uuid(文件名)读取chunk*/
+	/**
+	 * 从chunk_uuid(文件名)读取chunk
+	 * @param String 类型的chunk_uuid
+	 * @return 返回从chunk_uuid读取到的内容：String类型。
+	 */
 	public String read(String chunk_uuid) throws IOException, ClassNotFoundException  {
 		Socket client = null;
 		try {
@@ -53,7 +67,10 @@ public class DataNode {
 		return arr[0].toString();
 	}
 
-	/* 删除chunk_uuid(文件名) */
+	/**
+	 * 删除chunk_uuid(文件名)
+	 * @param  String 类型的chunk_uuid
+	 */
 	public void delete(String chunk_uuid) throws IOException, ClassNotFoundException {
 		Socket client = null;
 		try {

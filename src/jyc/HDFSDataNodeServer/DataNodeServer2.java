@@ -2,21 +2,42 @@ package jyc.HDFSDataNodeServer;
 
 import java.net.*;
 import java.io.*;
-
+/**
+ * 使用socket Server实现DataNode。一直处于监听状态，对传输的数据进行处理。
+ * 对收到的Object(String [])数据进行判断，数据中arr[0]为传输的命令；arr[1]为文件名；arr[2]为chunk文件内容。
+ * 其中，arr[1]和arr[2]为可选项。
+ * 根据arr[0]的 不同，作出不同反应：
+ * 1.write:此时，arr[1]为文件名(chunk_uuid)，arr[2]为chunk文件内容。将内容写入该文件中。
+ * 2.read：读取文件名(chunk_uuid)的内容并返回。
+ * 3.delete：删除文件名(chunk_uuid)的内容并返回是否成功。
+ * 注：输入其他命令时，会提示“Wrong command”
+ * @author DanielJyc
+ *
+ */
 public class DataNodeServer2 extends Thread {
 	private Socket server;
 	private String path ="."+ File.separator + "DataNode2" + File.separator;
-
+	/**
+	 * 构造函数，初始化：为每一个DataNodeServer创建不同的目录，存放chunk数据。
+	 * @param ser
+	 */
 	public DataNodeServer2(Socket ser) {
 		this.server = ser;
 		File dir = new File(path);
 		if(dir.exists()){
 			System.out.println("目录" + path + "存在");
 		}
-//		System.out.println(dir);
 		dir.mkdirs();
 	}
-
+	/**
+	 * 对收到的Object(String [])数据进行判断，数据中arr[0]为传输的命令；arr[1]为文件名；arr[2]为chunk文件内容。
+	 * 其中，arr[1]和arr[2]为可选项。
+	 * 根据arr[0]的 不同，作出不同反应：
+	 * 1.write:此时，arr[1]为文件名(chunk_uuid)，arr[2]为chunk文件内容。将内容写入该文件中。
+	 * 2.read：读取文件名(chunk_uuid)的内容并返回。
+	 * 3.delete：删除文件名(chunk_uuid)的内容并返回是否成功。
+	 * 注：输入其他命令时，会提示“Wrong command”
+	 */
 	public void run() {
 		try {
 			ObjectOutputStream out = new ObjectOutputStream(server.getOutputStream());
@@ -61,7 +82,11 @@ public class DataNodeServer2 extends Thread {
 			e.printStackTrace();
 		} 
 	}
-
+	/**
+	 * delete：删除文件名(chunk_uuid)的内容并返回是否成功。
+	 * @param chunk_uuid
+	 * @return 删除成功返回true，否则返回false
+	 */
 	private boolean delete(String chunk_uuid) {
 		// TODO Auto-generated method stub
 		File file = new File( path+chunk_uuid);
@@ -71,7 +96,12 @@ public class DataNodeServer2 extends Thread {
 			return file.delete();
 		}
 	}
-
+	/**
+	 * 2.read：读取文件名(chunk_uuid)的内容并返回。
+	 * @param chunk_uuid
+	 * @return 返回文件内容。
+	 * @throws IOException 读取失败，返回标识-1，告诉Client从下一个DataNode读取。
+	 */
 	private String read(String chunk_uuid) throws IOException {
 		// TODO Auto-generated method stub
 		FileInputStream fis;
@@ -86,7 +116,12 @@ public class DataNodeServer2 extends Thread {
 			return "-1"; // 文件不存在范围-1，从而方便从下一个读取
 		}
 	}
-
+	/**
+	 * 1.write:此时，arr[1]为文件名(chunk_uuid)，arr[2]为chunk文件内容。将内容写入该文件中。
+	 * @param chunk_uuid  arr[1]为文件名(chunk_uuid)
+	 * @param chunk  arr[2]为chunk文件内容
+	 * @throws IOException ：输出："The file in HDFS is broken."
+	 */
 	private void write(String chunk_uuid, String chunk) throws IOException {
 		// TODO Auto-generated method stub
 		FileOutputStream fos = null;
