@@ -12,12 +12,11 @@ import jyc.HDFS.NameNode;
 
 public class Client {
 	NameNode namenode;
-	public Client(NameNode nn) {
-		// TODO Auto-generated constructor stub
-		namenode = nn;
+	public Client(NameNode nn) {  
+		this.namenode = nn;
 	}
 	
-	public void write(String filename, String data) throws IOException {
+	public void write(String filename, String data) throws IOException, ClassNotFoundException {
 		List chunks = new ArrayList();  //存放data分出来的num_chunks份数据
 		int chunkloc = 1;
 		int num_chunks = get_num_chunks(data);
@@ -26,10 +25,6 @@ public class Client {
 			int high = (i+1)*namenode.chunksize > data.length()? data.length():(i+1)*namenode.chunksize;
 			chunks.add(data.subSequence(low, high) );			
 		}
-		//test
-//		for (Object chunk: chunks) {
-//			System.out.println(chunk);
-//		}
 		//为文件分配空间，更新元数据
 		List chunk_uuids = namenode.alloc(filename, num_chunks);
 		for (int i = 0; i < chunk_uuids.size(); i++) {
@@ -41,28 +36,28 @@ public class Client {
 		}
 	}
 	
-	public String read(String filename) throws IOException {
+	public String read(String filename) throws IOException, ClassNotFoundException {
 		if (true == namenode.exits(filename)) {
 			String data = new String();
 			List chunk_uuids = (List) namenode.filetable.get(filename);
 			for (Object chunk_uuid : chunk_uuids) {
 				int chunkloc = (Integer) namenode.chunktable.get(chunk_uuid);
 				String data_temp = ((DataNode)namenode.datanodes.get(chunkloc) ).read(chunk_uuid.toString());
-				if ("-1" == data_temp) { //读取当前DataNode上的chunk不存在（即：某一个DataNode被损坏。注：两个损坏时，可以读取数据，但是不完整（用-1代替））
-					data_temp = ((DataNode)namenode.datanodes.get(chunkloc%namenode.num_datanodes + 1) ).read(chunk_uuid.toString());//读取下一个DataNode的chunk
+				if (data_temp.equals("-1")) { //读取当前DataNode上的chunk不存在或者DataNode被kill（即：某一个DataNode被损坏。注：两个损坏时，可以读取数据，但是不完整（用-1代替））
 					System.out.println("Current chunk is broken."); 
+					data_temp = ((DataNode)namenode.datanodes.get(chunkloc%namenode.num_datanodes + 1) ).read(chunk_uuid.toString());//读取下一个DataNode的chunk
 				}
 				data = data + data_temp;
 			}
 			return data;
 		}
 		else{
-			System.out.println("File:"+filename+ "not exits.");
+			System.out.println("File:"+filename+ " not exits in HDFS.");
 			return "-1";
 		}
 	}
 	
-	public boolean delete(String filename) {
+	public boolean delete(String filename) throws ClassNotFoundException, IOException {
 		if (true ==  namenode.exits(filename)) {
 			List chunk_uuids = (List) namenode.filetable.get(filename);
 			for (Object chunk_uuid : chunk_uuids) {
@@ -75,7 +70,7 @@ public class Client {
 		}
 		else{
 			return false;
-		}		
+		}
 	}
 	
 	/*列出所有文件名*/

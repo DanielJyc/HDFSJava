@@ -1,54 +1,75 @@
 package jyc.HDFS;
+
 import java.io.*;
+import java.net.*;
 
 public class DataNode {
-		private String dir_name;
+	private String dir_name;
+	private int port;
+	
 
-		public DataNode(int chunkloc) {
+	/*初始化：不同的chunkloc对应不同的DataNode；通过修改port实现。
+	 * 后面可以通过数组存放不同的IP和端口号，从而实现真正意义的网络传输。*/
+	public DataNode(int chunkloc) {  
 		super();
-		// TODO Auto-generated constructor stub
-		dir_name = "D:"+File.separator+"DataNode"+File.separator+Integer.toString(chunkloc); 
-		File dir = new File(dir_name);
-		if(dir.exists()){
-			System.out.println("目录" + dir_name + "存在");
-		}
-//		System.out.println(dir);
-		dir.mkdirs();		
+		this.port = chunkloc + 12345;
 	}
-
-	public void write(String uuid, String data)throws IOException
-	{
-		FileOutputStream fos = new FileOutputStream(dir_name+File.separator+uuid);
-		fos.write(data.getBytes());
-		fos.close();
-	}		
 	
-	public String read(String uuid) throws IOException
-	{
-		FileInputStream fis;
+	/*将chunk写入chunk_uuid(文件名)*/
+	public void write(String chunk_uuid, String chunk) throws IOException, ClassNotFoundException {
+		Socket client = null;
 		try {
-			fis = new FileInputStream(dir_name+File.separator+uuid);
-			byte[] buf = new byte[fis.available()];//定义一个刚刚好的缓冲区。
-			fis.read(buf);
-			fis.close();		
-			return new String(buf);			
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-//			e.printStackTrace();
-			return "-1";  //文件不存在范围-1，从而方便从下一个读取
+			client = new Socket(InetAddress.getLocalHost(), port); // 向本机的port端口发出客户请求
+		} catch (Exception e) {
+			// TODO: handle exception
+			System.out.println("No server");			
 		}
-
+		ObjectOutputStream out = new ObjectOutputStream(
+				client.getOutputStream());
+		ObjectInputStream in = new ObjectInputStream(client.getInputStream());		
+		String[] s = new String[] { "write", chunk_uuid, chunk};
+		out.writeObject(s);  // 发送
+		out.flush(); // 刷新输出流，使Server马上收到该字符串
+		client.close();
 	}
 	
-	/*删除成功返回true 否则返回false（文件不存在）*/
-	public boolean delete(String uuid)
-	{
-		File file = new File(dir_name+File.separator+uuid);
-		if(!file.exists()){		//不存在，返回false
-			return false;
-		}
-		else{
-			return file.delete();			
-		}
+	/*从chunk_uuid(文件名)读取chunk*/
+	public String read(String chunk_uuid) throws IOException, ClassNotFoundException  {
+		Socket client = null;
+		try {
+			client = new Socket(InetAddress.getLocalHost(), port);// 向本机的port端口发出客户请求
+		}catch (IOException e) {
+			// TODO Auto-generated catch block
+			return "-1";
+		} 
+		ObjectOutputStream out = new ObjectOutputStream(
+				client.getOutputStream());
+		ObjectInputStream in = new ObjectInputStream(client.getInputStream());		
+		String[] s = new String[] { "read", chunk_uuid};
+		out.writeObject(s);  // 发送
+		out.flush(); // 刷新输出流，使Server马上收到该字符串		
+		String [] arr = (String[]) in.readObject(); //接收
+		client.close();
+		return arr[0].toString();
+	}
+
+	/* 删除chunk_uuid(文件名) */
+	public void delete(String chunk_uuid) throws IOException, ClassNotFoundException {
+		Socket client = null;
+		try {
+			client = new Socket(InetAddress.getLocalHost(), port);// 向本机的port端口发出客户请求
+			ObjectOutputStream out = new ObjectOutputStream(
+					client.getOutputStream());
+			ObjectInputStream in = new ObjectInputStream(client.getInputStream());		
+			String[] s = new String[] { "delete", chunk_uuid};
+			out.writeObject(s);// 发送
+			out.flush(); // 刷新输出流，使Server马上收到该字符串		
+			String [] arr = (String[]) in.readObject();//接收
+			client.close();
+			System.out.println(arr[0]);
+		}catch (IOException e) {
+			// TODO Auto-generated catch block
+			System.out.println( "Server not exits.");
+		} 
 	}
 }

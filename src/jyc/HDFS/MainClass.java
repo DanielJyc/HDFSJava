@@ -7,13 +7,20 @@ import jyc.HDFS.DataNode;
 public class MainClass {
 	private static final Integer Integer = null;
 
-	public static void main(String[] args) throws IOException, InterruptedException{
+	public static void main(String[] args) throws IOException, InterruptedException, ClassNotFoundException{
 		//Test all.
 		NameNode nn = new NameNode();
 		Client c = new Client(nn);
 		Command cmd =new Command(c);
 		cmd.command_line();
 		
+		//Test net-DataNode
+//		DataNode dn = new DataNode(2);
+//		dn.write("jyc", "0123456789abceefghijklmnopqrstuvwxyz");
+//		System.out.println(dn.read("jyc"));
+//		System.out.println(dn.read("jyc2"));
+//		Thread.currentThread().sleep(3000);
+//		dn.delete("jyc");
 		
 		
 //		System.out.println(System.getProperty("user.dir"));//user.dir指定了当前的路径

@@ -14,7 +14,7 @@ public class Command {
 		client = c;
 	}
 	
-	public void command_line() throws IOException {
+	public void command_line() throws IOException, ClassNotFoundException {
 		while (true) {
 			Scanner sc = new Scanner(System.in);
 			String cmd = sc.nextLine();
@@ -40,42 +40,42 @@ public class Command {
 		}
 	}
 
-	private void delete_cmd() {
+	private void delete_cmd() throws ClassNotFoundException, IOException {
 		// TODO Auto-generated method stub
 		Scanner sc = new Scanner(System.in);
 		String filename = sc.nextLine();
 		client.delete(filename);
 	}
 
-	private void download_cmd() throws IOException {
-		// TODO Auto-generated method stub
+	private void download_cmd() throws IOException, ClassNotFoundException {
 		Scanner sc = new Scanner(System.in);
 		System.out.println("Input the filename which you want to download in HDFS:");
 		String filename = sc.nextLine();  //输入文件名
 		String data = client.read(filename);
 		System.out.println(data);
-		//将文件数据写入本地
 		FileOutputStream fos = new FileOutputStream(filename);
-		fos.write(data.getBytes());
+		fos.write(data.getBytes());//将文件数据写入本地
 		fos.close();
 	}
 
-	private void upload_cmd() throws IOException {
-		// TODO Auto-generated method stub
+	private void upload_cmd() throws IOException, ClassNotFoundException {
 		Scanner sc = new Scanner(System.in);
 		System.out.println("Input the filename which you want to upload in local:");
 		String filename = sc.nextLine();
-		FileInputStream fis;
-		try {
-			fis = new FileInputStream(filename);
-			byte[] data = new byte[fis.available()];//定义一个刚刚好的缓冲区。
-			fis.read(data);
-			fis.close();	
-			client.write(filename, new String(data));
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-//			e.printStackTrace();
-			System.out.println("No such file in local. ");  //文件不存在范围-1，从而方便从下一个读取
+		if(false == client.namenode.exits(filename)){  //HDFS中不存在该文件时，上传。
+			FileInputStream fis;
+			try {
+				fis = new FileInputStream(filename);
+				byte[] data = new byte[fis.available()];//定义一个刚刚好的缓冲区。
+				fis.read(data);
+				fis.close();	
+				client.write(filename, new String(data));
+			} catch (FileNotFoundException e) {
+				System.out.println("No such file in local. ");  //文件不存在范围-1，从而方便从下一个读取
+			}	
+		}
+		else{
+			System.out.println("File:"+filename+" has exits in HDFS.");
 		}
 	}
 	

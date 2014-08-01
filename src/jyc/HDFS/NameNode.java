@@ -72,12 +72,11 @@ public class NameNode {
 		Iterator it = filetable.keySet().iterator();
 		while (it.hasNext()) {
 			Object me = (Object) it.next();
-//			System.out.println(me);
-			if(filename == me){
+			if(filename.equals(me)){
 				return true;
 			}
 		}
-		return true;
+		return false;
 	}
 }
 
