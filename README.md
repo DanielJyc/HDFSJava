@@ -1,8 +1,10 @@
-HDFSJava
+#HDFSJava
 ========
-A small project.
+
+## 简述
 用Java实现HDFS的最基本的功能：上传文件、下载文件、删除文件以及列出所有文件。
-详细要求：
+
+## 详细要求：
 1. 系统由一个 NAMENODE 和三个 DATANODE 组成 
 2. 数据复制数为 2 
 3. 只支持一个简单的单层的目录空间（即所有文件都在根目录下，不支持子目录） 
@@ -17,8 +19,14 @@ d. 拷贝一个 HDFS 文件到本地
 7. 可不考虑 DATANODE 崩溃重启后的 REPLICATOR 机制（即假设在一个 DATANODE 崩溃期间，其上存储的文件并无变化） 
 补充：1.实现基于多主机的HDFS，NameNode，DataNode需要部署在不同的主机上，依靠网络进行文件同步和通信
 
+# Plane
+## ToDo:
+1. 修正文件、socket部分的异常处理。
+2. DataNode和NameNode之间的通信机制修改为RMI。
+3. 数据持久化，重新登录时保持上次记录：序列化。
+4. 多用户处理：配置文件。
 
-演示： 
-1. 使用自己开发的命令行程序进行 4 中的 ABCD 四项操作 
-2. 操作过程中，随时杀死某个 DATANODE
+## Doing
+
+## Done
 
