@@ -105,8 +105,7 @@ public class DataNodeServer1 extends Thread {
 	/**
 	 * 2.read：读取文件名(chunk_uuid)的内容并返回。
 	 * @param chunk_uuid
-	 * @return 返回文件内容。
-	 * @throws IOException 读取失败，返回标识-1，告诉Client从下一个DataNode读取。
+	 * @return 返回文件内容。 读取失败，返回标识-1，告诉Client从下一个DataNode读取。
 	 */
 	private String read(String chunk_uuid)  {
 		// TODO Auto-generated method stub
@@ -131,7 +130,7 @@ public class DataNodeServer1 extends Thread {
 	 * 1.write:此时，arr[1]为文件名(chunk_uuid)，arr[2]为chunk文件内容。将内容写入该文件中。
 	 * @param chunk_uuid  arr[1]为文件名(chunk_uuid)
 	 * @param chunk  arr[2]为chunk文件内容
-	 * @throws IOException ：输出："The file in HDFS is broken."
+	 * IOException ：文件不存在的时候，输出："The file in HDFS is broken."
 	 */
 	private void write(String chunk_uuid, String chunk)  {
 		// TODO Auto-generated method stub
@@ -151,6 +150,10 @@ public class DataNodeServer1 extends Thread {
 		}
 	}
 
+	/**
+	 * 主程序入口：监听socket，接收数据；启动线程。
+	 * @param args
+	 */
 	@SuppressWarnings("resource")
 	public static void main(String[] args)  {
 		ServerSocket server = null;

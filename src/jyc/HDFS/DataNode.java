@@ -7,7 +7,7 @@ import java.net.*;
  * @author DanielJyc
  *
  */
-public class DataNode {
+public class DataNode implements Serializable {
 	private String dir_name;
 	private int port;
 	

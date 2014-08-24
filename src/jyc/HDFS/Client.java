@@ -25,23 +25,23 @@ public class Client {
 	public Client(NameNode nn) {  
 		this.namenode = nn;
 	}
+	
+	/***
+	 *  在Client中输入exits时，执行该函数：将NameNode信息序列化到namenode.out
+	 */
 	public void NameNodeSerial() {
         File file = new File("namenode.out");
         ObjectOutputStream oout = null;
         try {
 			oout = new ObjectOutputStream(new FileOutputStream(file));
-			oout.writeObject(this.namenode);
+			oout.writeObject(namenode);
 	        oout.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
-//        ObjectInputStream oin = new ObjectInputStream(new FileInputStream(file));
-//        Object newPerson = oin.readObject(); // 没有强制转换到Person类型
-//        oin.close();
-//        System.out.println(newPerson);
 	}
+	
 	/**
 	 * 功能：写入文件。通过调用DataNode和NameNode的方法，在DataNode写入实际数据；在NameNode写入元数据。
 	 * @param filename 文件名

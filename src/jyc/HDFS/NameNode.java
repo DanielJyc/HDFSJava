@@ -1,5 +1,6 @@
 package jyc.HDFS;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -12,7 +13,11 @@ import java.util.UUID;
  * @author DanielJyc
  *
  */
-public class NameNode {
+public class NameNode implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	int num_datanodes = 3; // num of datanode
 	int chunksize = 10; // size of chunk
 	Map<String, List<String>> filetable = new HashMap<String, List<String>>(); // ´æ·Å filename<-->chunkuuids

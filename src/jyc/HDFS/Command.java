@@ -1,6 +1,5 @@
 package jyc.HDFS;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -25,8 +24,6 @@ public class Command {
 	
 	/**
 	 * 利用while循环实现命令行的功能。输入exits，退出。
-	 * @throws IOException
-	 * @throws ClassNotFoundException
 	 */
 	public void command_line()  {
 		while (true) {
@@ -50,7 +47,8 @@ public class Command {
 			case "help":
 				System.out.println("There are 5 command: upload, download, delete, ls(all files), exits(exit the command)");
 				continue;
-			case "exits":				
+			case "exits":
+				client.NameNodeSerial();
 				System.exit(0);				
 			default:
 				System.out.println("Wrong command.");
@@ -61,8 +59,6 @@ public class Command {
 
 	/**
 	 * 删除命令
-	 * @throws ClassNotFoundException
-	 * @throws IOException
 	 */
 	private void delete_cmd(){
 		// TODO Auto-generated method stub
@@ -79,8 +75,6 @@ public class Command {
 
 	/**
 	 * 从HDFS下载命令
-	 * @throws IOException
-	 * @throws ClassNotFoundException
 	 */
 	private void download_cmd()  {
 		@SuppressWarnings("resource")
@@ -111,8 +105,6 @@ public class Command {
 
 	/**
 	 * 上传到HDFS命令
-	 * @throws IOException
-	 * @throws ClassNotFoundException
 	 */
 	private void upload_cmd()  {
 		@SuppressWarnings("resource")
