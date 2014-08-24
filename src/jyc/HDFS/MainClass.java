@@ -1,20 +1,15 @@
 package jyc.HDFS;
+
+import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.*;
+import java.io.ObjectInputStream;
 
-/**
- * ³ÌÐòÈë¿Ú
- * @author DanielJyc
- */
-import jyc.HDFS.DataNode;
 public class MainClass {
-	private static final Integer Integer = null;
-
-	public static void main(String[] args) throws IOException, InterruptedException, ClassNotFoundException{
+	public static void main(String[] args) {
 		NameNode nn = new NameNode();
 		Client c = new Client(nn);
 		Command cmd =new Command(c);
 		cmd.command_line();
+		
 	}
 }

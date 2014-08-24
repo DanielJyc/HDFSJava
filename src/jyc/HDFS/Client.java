@@ -1,6 +1,12 @@
 package jyc.HDFS;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -19,24 +25,39 @@ public class Client {
 	public Client(NameNode nn) {  
 		this.namenode = nn;
 	}
+	public void NameNodeSerial() {
+        File file = new File("namenode.out");
+        ObjectOutputStream oout = null;
+        try {
+			oout = new ObjectOutputStream(new FileOutputStream(file));
+			oout.writeObject(this.namenode);
+	        oout.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+//        ObjectInputStream oin = new ObjectInputStream(new FileInputStream(file));
+//        Object newPerson = oin.readObject(); // 没有强制转换到Person类型
+//        oin.close();
+//        System.out.println(newPerson);
+	}
 	/**
 	 * 功能：写入文件。通过调用DataNode和NameNode的方法，在DataNode写入实际数据；在NameNode写入元数据。
 	 * @param filename 文件名
 	 * @param data 文件内的数据
-	 * @throws IOException 
-	 * @throws ClassNotFoundException
 	 */
-	public void write(String filename, String data) throws IOException, ClassNotFoundException {
-		List chunks = new ArrayList();  //存放data分出来的num_chunks份数据
+	public void write(String filename, String data)  {
+		List<String>  chunks = new ArrayList<String> ();  //存放data分出来的num_chunks份数据
 		int chunkloc = 1;
 		int num_chunks = get_num_chunks(data);
 		for (int i = 0; i < num_chunks; i++) { //将data按照每个chunk大小为chunksize（10byte）进行拆分
 			int low = i*namenode.chunksize;
 			int high = (i+1)*namenode.chunksize > data.length()? data.length():(i+1)*namenode.chunksize;
-			chunks.add(data.subSequence(low, high) );			
+			chunks.add((String) data.subSequence(low, high) );			
 		}
 		//为文件分配空间，更新元数据
-		List chunk_uuids = namenode.alloc(filename, num_chunks);
+		List<String> chunk_uuids = namenode.alloc(filename, num_chunks);
 		for (int i = 0; i < chunk_uuids.size(); i++) {
 			chunkloc = i % namenode.num_datanodes + 1;
 			((DataNode) namenode.datanodes.get(chunkloc)).write(chunk_uuids.get(i).toString(), chunks.get(i).toString());
@@ -50,13 +71,11 @@ public class Client {
 	 * 功能：从HDFS读取文件。通过调用DataNode和NameNode的方法，从DataNode读取实际数据；从NameNode读取元数据。
 	 * @param filename
 	 * @return 返回文件内容data（String）。如果文件不存在，或者DataNode被kill，返回"-1"。
-	 * @throws IOException
-	 * @throws ClassNotFoundException
 	 */
-	public String read(String filename) throws IOException, ClassNotFoundException {
+	public String read(String filename) {
 		if (true == namenode.exits(filename)) {
 			String data = new String();
-			List chunk_uuids = (List) namenode.filetable.get(filename);
+			List<String> chunk_uuids = (List<String> ) namenode.filetable.get(filename);
 			for (Object chunk_uuid : chunk_uuids) {
 				int chunkloc = (Integer) namenode.chunktable.get(chunk_uuid);
 				String data_temp = ((DataNode)namenode.datanodes.get(chunkloc) ).read(chunk_uuid.toString());
@@ -77,12 +96,10 @@ public class Client {
 	 * 删除文件filename
 	 * @param String类型filename。
 	 * @return 删除成功，返回true；否则返回false。
-	 * @throws ClassNotFoundException
-	 * @throws IOException
 	 */
-	public boolean delete(String filename) throws ClassNotFoundException, IOException {
+	public boolean delete(String filename) {
 		if (true ==  namenode.exits(filename)) {
-			List chunk_uuids = (List) namenode.filetable.get(filename);
+			List<String>  chunk_uuids = (List<String> ) namenode.filetable.get(filename);
 			for (Object chunk_uuid : chunk_uuids) {
 				int chunkloc = (Integer) namenode.chunktable.get(chunk_uuid);
 				((DataNode)namenode.datanodes.get(chunkloc)).delete(chunk_uuid.toString()); //#物理删除:第一份
@@ -116,4 +133,6 @@ public class Client {
 	public int get_num_chunks(String data) {
 		return (int) Math.ceil((data.length()*1.0) / namenode.chunksize);
 	}
+	
+	
 }

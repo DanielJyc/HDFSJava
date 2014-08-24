@@ -80,6 +80,7 @@ public class DataNodeServer1 extends Thread {
 			in.close();
 			server.close();
 		} catch (IOException ex) {
+			ex.printStackTrace();
 		} catch (ClassNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -107,7 +108,7 @@ public class DataNodeServer1 extends Thread {
 	 * @return 返回文件内容。
 	 * @throws IOException 读取失败，返回标识-1，告诉Client从下一个DataNode读取。
 	 */
-	private String read(String chunk_uuid) throws IOException {
+	private String read(String chunk_uuid)  {
 		// TODO Auto-generated method stub
 		FileInputStream fis;
 		try {
@@ -119,6 +120,10 @@ public class DataNodeServer1 extends Thread {
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			return "-1"; // 文件不存在范围-1，从而方便从下一个读取
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return "-1"; 
 		}
 	}
 
@@ -128,7 +133,7 @@ public class DataNodeServer1 extends Thread {
 	 * @param chunk  arr[2]为chunk文件内容
 	 * @throws IOException ：输出："The file in HDFS is broken."
 	 */
-	private void write(String chunk_uuid, String chunk) throws IOException {
+	private void write(String chunk_uuid, String chunk)  {
 		// TODO Auto-generated method stub
 		FileOutputStream fos = null;
 		try {
@@ -137,15 +142,33 @@ public class DataNodeServer1 extends Thread {
 			// TODO Auto-generated catch block
 			System.out.println("The file in HDFS is broken.");
 		}
-		fos.write(chunk.getBytes());
-		fos.close();
+		try {
+			fos.write(chunk.getBytes());
+			fos.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
-	public static void main(String[] args) throws IOException {
-		ServerSocket server = new ServerSocket(12346);
+	@SuppressWarnings("resource")
+	public static void main(String[] args)  {
+		ServerSocket server = null;
+		try {
+			server = new ServerSocket(12346);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		while (true) {
 			// transfer location change Single User or Multi User
-			DataNodeServer1 ser = new DataNodeServer1(server.accept());
+			DataNodeServer1 ser = null;
+			try {
+				ser = new DataNodeServer1(server.accept());
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			ser.start();
 		}
 	}

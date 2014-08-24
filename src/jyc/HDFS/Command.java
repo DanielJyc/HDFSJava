@@ -28,9 +28,10 @@ public class Command {
 	 * @throws IOException
 	 * @throws ClassNotFoundException
 	 */
-	public void command_line() throws IOException, ClassNotFoundException {
+	public void command_line()  {
 		while (true) {
 			System.out.println("Please input your cmd(input help for info):");
+			@SuppressWarnings("resource")
 			Scanner sc = new Scanner(System.in);
 			String cmd = sc.nextLine();
 			switch (cmd) {  //5个命令
@@ -63,11 +64,17 @@ public class Command {
 	 * @throws ClassNotFoundException
 	 * @throws IOException
 	 */
-	private void delete_cmd() throws ClassNotFoundException, IOException {
+	private void delete_cmd(){
 		// TODO Auto-generated method stub
+		@SuppressWarnings("resource")
 		Scanner sc = new Scanner(System.in);
 		String filename = sc.nextLine();
-		client.delete(filename);
+		try {
+			client.delete(filename);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -75,15 +82,31 @@ public class Command {
 	 * @throws IOException
 	 * @throws ClassNotFoundException
 	 */
-	private void download_cmd() throws IOException, ClassNotFoundException {
+	private void download_cmd()  {
+		@SuppressWarnings("resource")
 		Scanner sc = new Scanner(System.in);
 		System.out.println("Input the filename which you want to download in HDFS:");
 		String filename = sc.nextLine();  //输入文件名
-		String data = client.read(filename);
+		String data = null;
+		try {
+			data = client.read(filename);
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		System.out.println(data);
-		FileOutputStream fos = new FileOutputStream(filename);
-		fos.write(data.getBytes());//将文件数据写入本地
-		fos.close();
+		FileOutputStream fos = null;
+		try {
+			fos = new FileOutputStream(filename);
+			fos.write(data.getBytes()); //将文件数据写入本地
+			fos.close();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -91,7 +114,8 @@ public class Command {
 	 * @throws IOException
 	 * @throws ClassNotFoundException
 	 */
-	private void upload_cmd() throws IOException, ClassNotFoundException {
+	private void upload_cmd()  {
+		@SuppressWarnings("resource")
 		Scanner sc = new Scanner(System.in);
 		System.out.println("Input the filename which you want to upload in local:");
 		String filename = sc.nextLine();
@@ -105,6 +129,9 @@ public class Command {
 				client.write(filename, new String(data));
 			} catch (FileNotFoundException e) {
 				System.out.println("No such file in local. ");  //文件不存在范围-1，从而方便从下一个读取
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}	
 		}
 		else{
